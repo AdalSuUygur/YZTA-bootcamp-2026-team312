@@ -1,4 +1,160 @@
-[
-  {"id": 1, "text": "Karmaşık problemleri sayılarla çözmekten keyif alırım.", "category": "analytic"},
-  {"id": 2, "text": "İnsanlarla iletişim kurmak ve onlara yardımcı olmak beni mutlu eder.", "category": "social"}
-]
+{
+  "envanterBilgisi": {
+    "isim": "Holland Mesleki Tercih Envanteri",
+    "aciklama": "Her maddeyi okuyun ve size uygun yanıtı işaretleyin. En yüksek 'Hoşlanırım' yanıtı ait olunan kişilik tipini, en yüksek 'Hoşlanmam' ise uzak olunan kişilik tipini gösterir.",
+    "secenekler": [
+      { "id": "hoslanirim", "etiket": "Hoşlanırım", "deger": 1 },
+      { "id": "farketmez", "etiket": "Farketmez", "deger": 0 },
+      { "id": "hoslanmam", "etiket": "Hoşlanmam", "deger": -1 }
+    ]
+  },
+  "kisilikTipleri": [
+    {
+      "isim": "Gerçekçi",
+      "belirginOzellikler": "Sabırlı ve hoşgörülü, pratik, maddeci, erkeksi, antisosyal, uyumlu, içten, doğal, sabırlı, iç görüleri ve başarma güdüleri fazla.",
+      "etkinlikler": [
+        "Kas etkinliği, motor koordinasyonu gerektiren işler",
+        "Açık havadaki işler, mekanik, sistematik çalışmalar",
+        "Nesneler, eşyalar, makineler ve hayvanlarla ilgili etkinlikler"
+      ]
+    },
+    {
+      "isim": "Araştırıcı",
+      "belirginOzellikler": "Entelektüel, analitik düşünce yapısına sahip, rasyonel, eleştirel, titiz, sabırlı, yöntemci, bağımsız, popüler olmaktan hoşlanmayan.",
+      "etkinlikler": [
+        "Analitik gözlem yapma",
+        "Sistematik deneysel çalışma",
+        "Fiziksel, biyolojik ve kültürel olguları araştırma"
+      ]
+    },
+    {
+      "isim": "Artistik",
+      "belirginOzellikler": "Heyecan ve coşkuları dengesiz, hayalci, fevri, karmaşık, sezgileri güçlü, bağımsız, duygusal, uyumlu olmayan, duyarlı ve etkileyici.",
+      "etkinlikler": [
+        "Estetik faaliyetler yapar",
+        "Tutkulu, bağımsız, sistematik olmayan aktiviteler",
+        "Sanatsal etkinlik ve ürünler yaratma",
+        "Bağımsız yaratıcı çalışmalar"
+      ]
+    },
+    {
+      "isim": "Sosyal",
+      "belirginOzellikler": "Yardımsever, sorumluluk sahibi, sosyal işbirliğine yatkın, empatik, arkadaş canlısı, içten, sabırlı, nazik, anlayışlı.",
+      "etkinlikler": [
+        "İnsanlarla birlikteliği saptayan aktiviteler",
+        "Başkalarını eğiterek geliştirmek, yardım etmek",
+        "Başkalarını ikna etme, yönlendirme"
+      ]
+    },
+    {
+      "isim": "Girişimci",
+      "belirginOzellikler": "Dışa dönük, enerjik, kendine güvenli, atılgan, fevri, ikna yeteneği yüksek, sabırsız, meraklı, maceracı, iyimser, sosyal, konuşkan.",
+      "etkinlikler": [
+        "Başkalarını ikna etmeye yönelik faaliyetler",
+        "Sosyal eğlendirici etkinlikler",
+        "Organize edilmiş çalışmalar"
+      ]
+    },
+    {
+      "isim": "Geleneksel",
+      "belirginOzellikler": "Dikkatli, titiz, itaatkar, tutarlı, esnek olmayan, düzenli, sabırlı, vicdanlı, özdenetimli, hayal gücünden yoksun, dengeli.",
+      "etkinlikler": [
+        "Sistemli kurallara bağlı aktiviteler",
+        "Nesnelerle ilgili sistematik çalışmalar",
+        "Kayıt tutma, hesaplama, kontrol işlemleri, veri işleme makineleri kullanma"
+      ]
+    }
+  ],
+  "sorular": [
+    { "no": 1, "madde": "Kuşların nasıl göç ettiğini öğrenmek", "kategori": "Araştırıcı" },
+    { "no": 2, "madde": "İnsanlara yeni bir hobi öğretmek", "kategori": "Sosyal" },
+    { "no": 3, "madde": "Hava durumu tahmini için kişisel gözlemleri kullanmak", "kategori": "Araştırıcı" },
+    { "no": 4, "madde": "Bitki hastalıklarını incelemek", "kategori": "Araştırıcı" },
+    { "no": 5, "madde": "Bankaya yatırılan paranın faizini hesaplamak", "kategori": "Geleneksel" },
+    { "no": 6, "madde": "Resimler tasarlamak ve çizmek", "kategori": "Artistik" },
+    { "no": 7, "madde": "Bir iş yaptırmak için parayla adam tutmak", "kategori": "Girişimci" },
+    { "no": 8, "madde": "Bir bilim müzesini incelemek", "kategori": "Araştırıcı" },
+    { "no": 9, "madde": "Gözlük için mercekleri parlatmak", "kategori": "Gerçekçi" },
+    { "no": 10, "madde": "Modern yazarların yazı stillerini araştırmak", "kategori": "Artistik" },
+    { "no": 11, "madde": "Mikroskop gibi laboratuar aletlerini kullanmak", "kategori": "Araştırıcı" },
+    { "no": 12, "madde": "Bir dükkanda envanter tutmak", "kategori": "Geleneksel" },
+    { "no": 13, "madde": "Bir kuş yemliği tasarlamak", "kategori": "Gerçekçi" },
+    { "no": 14, "madde": "Bir oyun için takım oluşturma", "kategori": "Artistik" },
+    { "no": 15, "madde": "Yeni bir satış kampanyası düzenlemek", "kategori": "Girişimci" },
+    { "no": 16, "madde": "Bir toplantıyı yönetmek", "kategori": "Girişimci" },
+    { "no": 17, "madde": "Vitaminlerin hayvanlar üzerindeki etkisini araştırmak", "kategori": "Araştırıcı" },
+    { "no": 18, "madde": "Küçük bir işletmeyi idare etmek", "kategori": "Girişimci" },
+    { "no": 19, "madde": "Bir makinenin nasıl kullanılacağı konusunda talimatlar yazmak", "kategori": "Gerçekçi" },
+    { "no": 20, "madde": "Diğer insanlar için iş planlamak", "kategori": "Girişimci" },
+    { "no": 21, "madde": "Küçük grup tartışmalarına katılmak", "kategori": "Sosyal" },
+    { "no": 22, "madde": "Yeni bir cerrahi işlem hakkında yazılar okumak", "kategori": "Araştırıcı" },
+    { "no": 23, "madde": "Mali bir hesaptaki hataları bulmak", "kategori": "Geleneksel" },
+    { "no": 24, "madde": "Bir rapor taslağındaki hataları bulmak incelemek", "kategori": "Geleneksel" },
+    { "no": 25, "madde": "Planlar ve grafikler yapmak", "kategori": "Gerçekçi" },
+    { "no": 26, "madde": "Fırtınadan sonra zarar görmüş bir ağacı onarmak", "kategori": "Gerçekçi" },
+    { "no": 27, "madde": "Kusurları bulmak için mamulleri incelemek", "kategori": "Geleneksel" },
+    { "no": 28, "madde": "Telefonla iş idare etmek", "kategori": "Girişimci" },
+    { "no": 29, "madde": "Acil durumlarda insanlara tardım etmek", "kategori": "Sosyal" },
+    { "no": 30, "madde": "Bir kuruluşun parayla ilgili bütün işlerini idare etmek", "kategori": "Geleneksel" },
+    { "no": 31, "madde": "Müzik eseri bestelemek veya düzenlemek", "kategori": "Artistik" },
+    { "no": 32, "madde": "Filmler için konu müziği bestelemek", "kategori": "Artistik" },
+    { "no": 33, "madde": "Yeni kurallar veya politikalar geliştirmek", "kategori": "Girişimci" },
+    { "no": 34, "madde": "Biyoloji çalışmak", "kategori": "Araştırıcı" },
+    { "no": 35, "madde": "Bir politik kurum için kampanyaya katılmak", "kategori": "Girişimci" },
+    { "no": 36, "madde": "Maddeleri ayırmak, biriktirmek ve saklamak", "kategori": "Geleneksel" },
+    { "no": 37, "madde": "Bir toplum geliştirme projesinde çalışmak", "kategori": "Sosyal" },
+    { "no": 38, "madde": "Bir daktilonun nasıl tamir edileceğini öğrenmek", "kategori": "Gerçekçi" },
+    { "no": 39, "madde": "Dünyanın merkezi, güneş ve yıldızlar hakkında kitaplar okumak", "kategori": "Araştırıcı" },
+    { "no": 40, "madde": "Tam doğru zaman tutmak için bir saati ayarlamak", "kategori": "Gerçekçi" },
+    { "no": 41, "madde": "Beynin nasıl çalıştığını öğrenmek", "kategori": "Araştırıcı" },
+    { "no": 42, "madde": "Yaratıcı fotoğraflar çekmek", "kategori": "Artistik" },
+    { "no": 43, "madde": "Masraflara ait hesap kayıtları tutmak", "kategori": "Geleneksel" },
+    { "no": 44, "madde": "Bir bandoda çalmak", "kategori": "Artistik" },
+    { "no": 45, "madde": "Bir orkestrada caz müziği çalmak", "kategori": "Artistik" },
+    { "no": 46, "madde": "Bir grup veya klüp için bütçe hazırlamak", "kategori": "Geleneksel" },
+    { "no": 47, "madde": "Depremin nedenlerini araştırmak", "kategori": "Araştırıcı" },
+    { "no": 48, "madde": "Ünlü bir bilim adamının dersine katılmak", "kategori": "Araştırıcı" },
+    { "no": 49, "madde": "Bir proje üzerinde başkaları ile beraber çalışmak", "kategori": "Sosyal" },
+    { "no": 50, "madde": "Bir sinema filmi senaryosu yazmak", "kategori": "Artistik" },
+    { "no": 51, "madde": "Şirket hakkındaki şikayetleri konusunda işçilerle röportaj yapmak", "kategori": "Girişimci" },
+    { "no": 52, "madde": "Mobilya yapmak", "kategori": "Gerçekçi" },
+    { "no": 53, "madde": "Değerli taşları kesmeyi ve parlatmayı öğrenmek", "kategori": "Gerçekçi" },
+    { "no": 54, "madde": "Yaralı bir insana ilkyardım yapmak", "kategori": "Gerçekçi" },
+    { "no": 55, "madde": "Yerel bir radyo istasyonunda çalınması için müzik parçaları seçmek", "kategori": "Sosyal" },
+    { "no": 56, "madde": "İl genel meclisinde çalışmak", "kategori": "Girişimci" },
+    { "no": 57, "madde": "Mali raporları hazırlamak ve yorumlamak", "kategori": "Geleneksel" },
+    { "no": 58, "madde": "Tehlikedeki bir insana yardım etmeye çalışmak", "kategori": "Sosyal" },
+    { "no": 59, "madde": "Elektronik alet çalıştırmak", "kategori": "Gerçekçi" },
+    { "no": 60, "madde": "Çocuklara nasıl oyun oynanacağını veya spor yapılacağını göstermek", "kategori": "Sosyal" },
+    { "no": 61, "madde": "Bir ustayı televizyon tamir ederken seyretmek", "kategori": "Gerçekçi" },
+    { "no": 62, "madde": "Bir magazin hikayesini anlatan çizimler yapmak", "kategori": "Artistik" },
+    { "no": 63, "madde": "Ziyaretçilere yol göstermek", "kategori": "Girişimci" },
+    { "no": 64, "madde": "Diğer insanların bir problemin çözülebileceğine nasıl inandıklarını öğrenmek", "kategori": "Sosyal" },
+    { "no": 65, "madde": "Bir sergiye gezi düzenlemek", "kategori": "Sosyal" },
+    { "no": 66, "madde": "Uyuşturucu kullanan insanlara danışmanlık yapmak", "kategori": "Sosyal" },
+    { "no": 67, "madde": "İş gazeteleri veya dergileri okumak", "kategori": "Girişimci" },
+    { "no": 68, "madde": "Yıldızların oluşumunu öğrenmek", "kategori": "Araştırıcı" },
+    { "no": 69, "madde": "Taksit ödemelerini tahsil etmek", "kategori": "Geleneksel" },
+    { "no": 70, "madde": "Bir slayt veya film projektörünü çalıştırmak", "kategori": "Gerçekçi" },
+    { "no": 71, "madde": "Kelebekleri gözlemlemek ve sınıflandırmak", "kategori": "Araştırıcı" },
+    { "no": 72, "madde": "Metal bir heykel tasarlamak", "kategori": "Artistik" },
+    { "no": 73, "madde": "İnsanlara kanuni doğruları açıklamak", "kategori": "Sosyal" },
+    { "no": 74, "madde": "Kısa hikayeler yazmak", "kategori": "Artistik" },
+    { "no": 75, "madde": "İnsanların mali kararlar vermelerine yardımcı olmak", "kategori": "Girişimci" },
+    { "no": 76, "madde": "Gelir vergisi kazancını düzenlemek", "kategori": "Geleneksel" },
+    { "no": 77, "madde": "Sertifika, plaket veya taktir belgesi kazanmak", "kategori": "Artistik" },
+    { "no": 78, "madde": "Tiyatro oyunu, müzikaller gibi sanatsal etkinliklerin eleştirilerini yazmak", "kategori": "Artistik" },
+    { "no": 79, "madde": "Aylık bütçe planı yapmak", "kategori": "Geleneksel" },
+    { "no": 80, "madde": "Bir havuz veya gölde yabani hayatı araştırmak", "kategori": "Araştırıcı" },
+    { "no": 81, "madde": "Bir tiyatro oyununda rol almak", "kategori": "Artistik" },
+    { "no": 82, "madde": "Bir resim çerçevesi yapmak", "kategori": "Gerçekçi" },
+    { "no": 83, "madde": "İş gezilerine çıkmak", "kategori": "Girişimci" },
+    { "no": 84, "madde": "Orman yangınları için gözetleme yapmak", "kategori": "Gerçekçi" },
+    { "no": 85, "madde": "Yeni alışveriş merkezinin tanıtımını yapmak", "kategori": "Girişimci" },
+    { "no": 86, "madde": "Bir muhasebecilik sistemi kurmak", "kategori": "Geleneksel" },
+    { "no": 87, "madde": "Arkadaşlar arasındaki bir tartışmayı yatıştırmak", "kategori": "Sosyal" },
+    { "no": 88, "madde": "Birine önemli bir karar vermesinde yardım etmek", "kategori": "Sosyal" },
+    { "no": 89, "madde": "Taşıma için nakil maliyetlerini hesaplamak", "kategori": "Geleneksel" },
+    { "no": 90, "madde": "Fıkralar ve hikayeler anlatarak insanları eğlendirmek", "kategori": "Sosyal" }
+  ]
+}
