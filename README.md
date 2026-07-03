@@ -1,4 +1,4 @@
-# 🚀 Takım İsmi / Proje İsmi (Buraya Kendi Belirlediğiniz İsimleri Yazın)
+# Takım 312
 
 ## 👥 Takım Rolleri
 * **Tesnim Çelik**: Product Owner
