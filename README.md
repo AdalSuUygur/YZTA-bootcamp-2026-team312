@@ -11,8 +11,7 @@
 
 ## 🎯 Ürün Bilgileri
 
-### Ürün İsmi
-*(Örn: GuideAI, YönBul, AtlasAI vb.)*
+### Ürün İsmi: GuideAI
 
 ### Ürün Açıklaması
 Üniversite ve kariyer seçim sürecinde kararsızlık yaşayan bireylere yapay zeka destekli rehberlik sunan kişiselleştirilmiş bir platformdur. Projemiz yeni veri üretmek yerine, YÖK Atlas'ın güvenilir ve resmi verilerini yapay zeka ile anlamlı, yorumlanabilir ve kişiye özel bir katmana dönüştürür.
