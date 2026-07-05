@@ -49,7 +49,30 @@ Proje, temiz kod prensiplerine ve katmanlı mimariye uygun olarak frontend/backe
 
 ## 🔄 Sprint Dokümantasyonu
 
-### 📍 Sprint 1
-* **Sprint Durumu / Ekran Görüntüleri:** *(İlk sprint sonunda geliştirilen arayüz veya backend çıktıları buraya eklenecektir)*
-* **Daily Scrum Notları:** *(Slack veya toplantı özetleri link/görsel olarak eklenecektir)*
-* **Sprint Board Durumu:** *(Sprint sonundaki Kanban board ekran görüntüsü)*
+📍 SPRINT 1 DOKÜMANTASYONU
+### 🎯 Sprint 1 Hedefi (Sprint Goal)
+Kullanıcının hangi alanlara ve mesleklere yatkın olduğunu anlamasını sağlayacak Holland Meslek Tercih Envanteri tabanlı, dinamik ve akıcı bir ön yüz (frontend) arayüzünün tasarlanması; arka planda bu cevapları deterministik bir algoritmayla işleyip Gemini API (response_schema ve Pydantic) üzerinden tutarlı 5 üniversite bölümü önerecek yapay zeka mimarisinin uçtan uca tamamlanması.
+### 🛠️ Sprint İçerisinde Tamamlanan Görevler (Done)
+ * **Task 1.1 (Soru Havuzu):** Holland Meslek Tercih Envanteri'ni temel alan 90 soruluk veri seti assets/questions.json formatında projeye entegre edildi.
+ * **Task 1.2 (LLM Prompt & Şema Tasarımı):**
+   * Yapay zekanın halüsinasyon görmesini engellemek adına katı kurallar ve few-shot örnekler içeren system_prompt.py yazıldı.
+   * Gemini API'nin her zaman kararlı ve frontend tarafından doğrudan okunabilir veri üretmesini garanti eden Pydantic çıktı şeması (schemas.py ve llm_service.py) kuruldu.
+   * Gerçek API anahtarı ile yapılan 3 tekrarlı testlerde tutarlılık ve DoD şartları doğrulandı.
+ * **Task 1.3 (Frontend Arayüz Kodlaması):**
+   * **GuideAI** markası altında; 
+-Karşılama Ekranı
+
+-İlerleme çubuklu (Progress Bar) Test Ekranı 
+
+-"Sonuçlar Hesaplanıyor" animasyonlu Yüklenme Ekranı 
+
+-Uyum skorlarını içeren Sonuç Ekranı 
+
+tamamen kodlandı.
+   * Cevapların arka planda {soru_no: deger} formatında (Hoşlanırım=1, Farketmez=0, Hoşlanmam=-1) toplanma mekanizması kuruldu.
+### 📊 Sprint Durumu & Ekran Görüntüleri
+ * **Arayüz Çıktıları:** Geliştirilen GuideAI ön yüz mimarisine ait 4 temel ekranın (Giriş, Test Süreci, Hesaplama Katmanı ve Uyum Raporu) çalışan ekran görüntüleri dökümantasyona eklenmiştir
+
+.
+ * **Kanban Board Durumu:** Katman 1'e ait olan Task 1.1, Task 1.2 ve Task 1.3 görevleri başarıyla **DONE** sütununa taşınmıştır.
+ * **Slack / Daily Scrum Notları:** Ekip içi entegrasyon kanalları üzerinden veri formatları ({soru_no: deger}) paylaşılarak frontend ve backend arasındaki kontrat doğrulanmıştır.
