@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuideAI - Kendini Tanı</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        h1 { color: #2c3e50; }
+        .btn { background-color: #3498db; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 10px 5px; }
+        .btn:hover { background-color: #2980b9; }
+        .btn-group { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .progress-bar-container { background-color: #e0e0e0; border-radius: 8px; height: 10px; width: 100%; margin-bottom: 30px; overflow: hidden; }
+        .progress-bar { background-color: #2ecc71; height: 100%; width: 0%; transition: width 0.3s ease; }
+        .question-text { font-size: 20px; font-weight: 500; margin-bottom: 30px; min-height: 60px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .result-list { text-align: left; margin-top: 20px; list-style-type: none; padding: 0; }
+        .result-item { background: #f8f9fa; margin-bottom: 15px; padding: 15px; border-left: 4px solid #3498db; border-radius: 4px; }
+        .result-title { font-weight: bold; font-size: 18px; color: #2c3e50; }
+        .result-desc { font-size: 14px; color: #555; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="screen-welcome" class="screen active">
+        <h1>GuideAI'a Hoş Geldin</h1>
+        <p>Hangi alanlara ve mesleklere yatkın olduğunu keşfetmek için testimizi çözmeye başla. Karşına çıkacak durumlardan ne kadar hoşlandığını seçmen yeterli.</p>
+        <button class="btn" onclick="startTest()">Teste Başla</button>
+    </div>
+
+    <div id="screen-test" class="screen">
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="question-text" class="question-text">Soru yükleniyor...</div>
+        <div class="btn-group">
+            <button class="btn" onclick="answerQuestion(1)">Hoşlanırım</button>
+            <button class="btn" style="background-color: #95a5a6;" onclick="answerQuestion(0)">Farketmez</button>
+            <button class="btn" style="background-color: #e74c3c;" onclick="answerQuestion(-1)">Hoşlanmam</button>
+        </div>
+    </div>
+
+    <div id="screen-loading" class="screen">
+        <h2>Sonuçlar Hesaplanıyor...</h2>
+        <p>Yapay zeka profiline en uygun bölümleri analiz ediyor.</p>
+        <div class="spinner"></div>
+    </div>
+
+    <div id="screen-results" class="screen">
+        <h2>Sana En Uygun Bölümler</h2>
+        <ul id="results-list" class="result-list"></ul>
+        <button class="btn" onclick="location.reload()">Testi Tekrar Çöz</button>
+    </div>
+</div>
+
+<script>
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = {}; // {soru_no: deger} formatında tutulacak
+
+    // JSON dosyasını çekme işlemi
+    async function startTest() {
+        showScreen('screen-test');
+        try {
+            // assets klasöründen JSON okuma
+            const response = await fetch('../assets/questions.json');
+            const data = await response.json();
+            questions = data.sorular; 
+            renderQuestion();
+        } catch (error) {
+            document.getElementById('question-text').innerText = "Sorular yüklenirken hata oluştu. Dosya yolunu kontrol edin.";
+            console.error(error);
+        }
+    }
+
+    function renderQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            finishTest();
+            return;
+        }
+        
+        const q = questions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = q.no + ". " + q.madde;
+        
+        // Progress bar güncelleme
+        const progress = ((currentQuestionIndex) / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+    }
+
+    function answerQuestion(score) {
+        const q = questions[currentQuestionIndex];
+        userAnswers[q.no] = score; // Bilge'nin istediği formata uygun kayıt
+        
+        currentQuestionIndex++;
+        renderQuestion();
+    }
+
+    async function finishTest() {
+        showScreen('screen-loading');
+        document.getElementById('progress-bar').style.width = '100%';
+        
+        // Backend API hazır olana kadar konsola veriyi basıyoruz
+        console.log("Backend'e gidecek JSON Verisi:", JSON.stringify(userAnswers, null, 2));
+
+        try {
+            /* // Backend Yazıldığında aktif edilecek alan:
+            const response = await fetch('http://localhost:8000/api/v1/test/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers: userAnswers })
+            });
+            const resultData = await response.json();
+            */
+
+            // Şu an API olmadığı için 3 saniye bekleyip yapay zeka sahte (mock) yanıt dönmüş gibi yapıyoruz:
+            setTimeout(() => {
+                const mockResult = [
+                    { bolum: "Endüstri Mühendisliği", uyum_skoru: 95, gerekce: "Sistem analizi ve optimizasyon yeteneğin çok güçlü." },
+                    { bolum: "Bilgisayar Mühendisliği", uyum_skoru: 88, gerekce: "Analitik düşünce ve problem çözme becerin yüksek." }
+                ];
+                renderResults(mockResult);
+            }, 3000);
+
+        } catch (error) {
+            console.error("API Hatası:", error);
+            document.getElementById('screen-loading').innerHTML = "<h2>Bağlantı Hatası!</h2><p>Backend API'sine ulaşılamadı.</p>";
+        }
+    }
+
+    function renderResults(results) {
+        showScreen('screen-results');
+        const listContainer = document.getElementById('results-list');
+        listContainer.innerHTML = '';
+
+        results.forEach(item => {
+            listContainer.innerHTML += `
+                <li class="result-item">
+                    <div class="result-title">${item.bolum} - %${item.uyum_skoru} Uyum</div>
+                    <div class="result-desc">${item.gerekce}</div>
+                </li>
+            `;
+        });
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+</script>
+</body>
+</html>
