@@ -2,7 +2,7 @@
 
 ## 👥 Takım Rolleri
 * **Tesnim Çelik**: Product Owner
-* **Mehmet Can Kabalak**: Scrum Master (İletişim Sorumlusu)
+* **Mehmet Can Kabalak**: Scrum Master
 * **Bilge Yılmaz**: Developer
 * **Nisa Nur Yılmaz**: Developer
 * **Adal Su Uygur**: Developer
