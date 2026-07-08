@@ -47,11 +47,11 @@ Proje, temiz kod prensiplerine ve katmanlı mimariye uygun olarak frontend/backe
 
 ---
 
-## 🔄 Sprint Dokümantasyonu
+## Sprint Dokümantasyonu
 
-📍 SPRINT 1 DOKÜMANTASYONU
 ### 🎯 Sprint 1 Hedefi (Sprint Goal)
 Kullanıcının hangi alanlara ve mesleklere yatkın olduğunu anlamasını sağlayacak Holland Meslek Tercih Envanteri tabanlı, dinamik ve akıcı bir ön yüz (frontend) arayüzünün tasarlanması; arka planda bu cevapları deterministik bir algoritmayla işleyip Gemini API (response_schema ve Pydantic) üzerinden tutarlı 5 üniversite bölümü önerecek yapay zeka mimarisinin uçtan uca tamamlanması.
+
 ### 🛠️ Sprint İçerisinde Tamamlanan Görevler (Done)
  * **Task 1.1 (Soru Havuzu):** Holland Meslek Tercih Envanteri'ni temel alan 90 soruluk veri seti assets/questions.json formatında projeye entegre edildi.
  * **Task 1.2 (LLM Prompt & Şema Tasarımı):**
