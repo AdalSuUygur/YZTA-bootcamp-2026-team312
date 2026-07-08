@@ -104,31 +104,31 @@
         showScreen('screen-loading');
         document.getElementById('progress-bar').style.width = '100%';
         
-        // Backend API hazır olana kadar konsola veriyi basıyoruz
-        console.log("Backend'e gidecek JSON Verisi:", JSON.stringify(userAnswers, null, 2));
+        // answers objesini backend'in beklediği {answers: [{question_id, score}]} formatına çevir
+        const answersList = Object.entries(userAnswers).map(([soru_no, deger]) => ({
+            question_id: Number(soru_no),
+            score: deger
+        }));
 
         try {
-            /* // Backend Yazıldığında aktif edilecek alan:
             const response = await fetch('http://localhost:8000/api/v1/test/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ answers: userAnswers })
+                body: JSON.stringify({ answers: answersList })
             });
-            const resultData = await response.json();
-            */
 
-            // Şu an API olmadığı için 3 saniye bekleyip yapay zeka sahte (mock) yanıt dönmüş gibi yapıyoruz:
-            setTimeout(() => {
-                const mockResult = [
-                    { bolum: "Endüstri Mühendisliği", uyum_skoru: 95, gerekce: "Sistem analizi ve optimizasyon yeteneğin çok güçlü." },
-                    { bolum: "Bilgisayar Mühendisliği", uyum_skoru: 88, gerekce: "Analitik düşünce ve problem çözme becerin yüksek." }
-                ];
-                renderResults(mockResult);
-            }, 3000);
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.detail || `Sunucu hatası: ${response.status}`);
+            }
+
+            const resultData = await response.json();
+            renderResults(resultData.onerilen_bolumler);
 
         } catch (error) {
             console.error("API Hatası:", error);
-            document.getElementById('screen-loading').innerHTML = "<h2>Bağlantı Hatası!</h2><p>Backend API'sine ulaşılamadı.</p>";
+            document.getElementById('screen-loading').innerHTML =
+                `<h2>Bağlantı Hatası!</h2><p>Backend API'sine ulaşılamadı. Backend'in (uvicorn) çalıştığından emin ol.</p><p style="font-size:12px;color:#999;">${error.message}</p>`;
         }
     }
 
