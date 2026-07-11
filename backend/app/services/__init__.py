@@ -1,0 +1,1 @@
+from .atlas_service import get_universities_by_code

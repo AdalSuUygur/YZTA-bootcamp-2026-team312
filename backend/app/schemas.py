@@ -30,5 +30,20 @@ class AnalysisResult(BaseModel):
     holland_kodu: str = Field(..., description="Kullanıcının baskın 3 harfli Holland kodu, ör. 'IAS'")
     profil_ozeti: str = Field(..., description="Kullanıcının kişilik profilinin 2-3 cümlelik özeti")
     onerilen_bolumler: list[DepartmentSuggestion] = Field(
-        ..., min_length=5, max_length=5, description="Uyum skoruna göre azalan sırada tam 5 bölüm önerisi"
+        ..., min_items=5, max_items=5, description="Uyum skoruna göre azalan sırada tam 5 bölüm önerisi"
     )
+
+
+class UniversityDetail(BaseModel):
+    university_name: str
+    quota: int
+    last_min_score: float
+    last_min_rank: int
+
+
+class DetailedDepartmentMatch(BaseModel):
+    department_code: str
+    department_name: str
+    uyum_skoru: int
+    gerekce: str
+    universities: list[UniversityDetail]
