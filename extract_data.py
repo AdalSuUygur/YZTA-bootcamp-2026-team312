@@ -1,7 +1,12 @@
 import pandas as pd
 import os
 import re
-import sqlite3
+import sys
+
+# Proje kökünü sys.path'e ekle — backend paketini bulabilmek için
+_PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 
 
 def turkish_upper(text):
@@ -62,11 +67,14 @@ target_mappings = {
 }
 
 
-def main():
-    file_path = "tablo4_01082025d (2).xls"
+def extract_to_csv(file_path: str, csv_output: str, excel_output: str) -> bool:
+    """
+    XLS dosyasından veriyi okur, CSV ve Excel dosyalarına yazar.
+    Başarılıysa True, değilse False döner.
+    """
     if not os.path.exists(file_path):
-        print(f"Dosya bulunamadı: {file_path}")
-        return
+        print(f"[HATA] Dosya bulunamadı: {file_path}")
+        return False
 
     print("Veri yükleniyor...")
     df = pd.read_excel(file_path)
@@ -84,7 +92,7 @@ def main():
         if pd.isna(code):
             if isinstance(name, str):
                 name_clean = clean_uni_name(name)
-                is_uni = "ÜNİVERSİTESİ" in name_clean or "ÜNİVERSİTE" in name_clean or name_clean in target_mappings
+                is_uni = "ÜNİVERSİTESİ" in name_clean or "ÜNİVERSİTE" in name_clean
 
                 if is_uni:
                     matched = False
@@ -132,45 +140,43 @@ def main():
 
     out_df = pd.DataFrame(extracted_data)
     if len(out_df) == 0:
-        print("Eşleşen veri bulunamadı.")
-        return
+        print("[HATA] Eşleşen veri bulunamadı.")
+        return False
 
     print("Veri tipleri optimize ediliyor...")
     out_df['Başarı Sırası'] = pd.to_numeric(out_df['Başarı Sırası'], errors='coerce').fillna(0).astype(int)
-    out_df['Taban Puan (En Küçük Puan)'] = pd.to_numeric(out_df['Taban Puan (En Küçük Puan)'], errors='coerce').fillna(
-        0.0)
+    out_df['Taban Puan (En Küçük Puan)'] = pd.to_numeric(
+        out_df['Taban Puan (En Küçük Puan)'], errors='coerce').fillna(0.0)
     out_df['Puan Türü'] = out_df['Puan Türü'].astype('category')
     out_df['Süre (Yıl)'] = pd.to_numeric(out_df['Süre (Yıl)'], errors='coerce').fillna(0).astype(int)
     out_df['Genel Kontenjan'] = pd.to_numeric(out_df['Genel Kontenjan'], errors='coerce').fillna(0).astype(int)
-    out_df['Okul Birincisi Kontenjanı'] = pd.to_numeric(out_df['Okul Birincisi Kontenjanı'], errors='coerce').fillna(
-        0).astype(int)
-
-    excel_output = "universite_bolum_puanlar.xlsx"
-    csv_output = "universite_bolum_puanlar.csv"
+    out_df['Okul Birincisi Kontenjanı'] = pd.to_numeric(
+        out_df['Okul Birincisi Kontenjanı'], errors='coerce').fillna(0).astype(int)
 
     out_df.to_excel(excel_output, index=False)
     out_df.to_csv(csv_output, index=False, encoding="utf-8-sig")
-    print(f"Dosyalar kaydedildi: {excel_output}, {csv_output}")
+    print(f"[OK]  Çıktı dosyaları kaydedildi: {excel_output}, {csv_output}")
+    print(f"      Toplam satır: {len(out_df)} | "
+          f"Üniversite sayısı: {out_df['Üniversite Adı'].nunique()}")
+    return True
 
-    print("SQLite veritabanı senkronizasyonu başlatılıyor...")
-    conn = sqlite3.connect('universite_tercih_mvp.db')
 
-    df_sql = out_df.drop(columns=['Üniversite (Spreadsheet)']).rename(columns={
-        'Üniversite Adı': 'universite_adi',
-        'Fakülte/Yüksekokul': 'fakulte',
-        'Program Kodu': 'program_kodu',
-        'Program Adı': 'program_adi',
-        'Süre (Yıl)': 'sure',
-        'Puan Türü': 'puan_turu',
-        'Genel Kontenjan': 'genel_kontenjan',
-        'Okul Birincisi Kontenjanı': 'okul_birincisi_kontenjani',
-        'Başarı Sırası': 'basari_sirasi',
-        'Taban Puan (En Küçük Puan)': 'taban_puan'
-    })
+def main():
+    xls_file = os.path.join(_PROJECT_ROOT, "tablo4_01082025d (2).xls")
+    csv_output = os.path.join(_PROJECT_ROOT, "universite_bolum_puanlar.csv")
+    excel_output = os.path.join(_PROJECT_ROOT, "universite_bolum_puanlar.xlsx")
 
-    df_sql.to_sql('bolumler', conn, if_exists='replace', index=False)
-    conn.close()
-    print("Veritabanı tablosu güncellendi: universite_tercih_mvp.db -> bolumler")
+    # ── Adım 1: XLS → CSV / Excel ────────────────────────────────────────────
+    ok = extract_to_csv(xls_file, csv_output, excel_output)
+    if not ok:
+        sys.exit(1)
+
+    # ── Adım 2: CSV → departments.db (SQLAlchemy ORM) ────────────────────────
+    # seed.py, CSV yolunu _CSV_PATH sabitiyle _PROJECT_ROOT'tan okur;
+    # yukarıda csv_output aynı yere yazıldığı için doğrudan çağrılabilir.
+    print("\nSQLAlchemy ORM seed başlatılıyor → backend/app/db/departments.db")
+    from backend.app.db.seed import seed  # noqa: E402  (geç import — sys.path hazır)
+    seed()
 
 
 if __name__ == "__main__":
