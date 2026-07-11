@@ -3,7 +3,6 @@ import os
 import re
 import sys
 
-# Proje kökünü sys.path'e ekle — backend paketini bulabilmek için
 _PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
@@ -12,25 +11,13 @@ if _PROJECT_ROOT not in sys.path:
 def turkish_upper(text):
     if not isinstance(text, str):
         return ""
-    mapping = {
-        "i": "İ",
-        "ı": "I",
-        "ş": "Ş",
-        "ğ": "Ğ",
-        "ü": "Ü",
-        "ö": "Ö",
-        "ç": "Ç"
-    }
-    upper_text = ""
-    for char in text:
-        upper_text += mapping.get(char, char.upper())
-    return upper_text
+    mapping = {"i": "İ", "ı": "I", "ş": "Ş", "ğ": "Ğ", "ü": "Ü", "ö": "Ö", "ç": "Ç"}
+    return "".join(mapping.get(c, c.upper()) for c in text)
 
 
 def clean_uni_name(name):
     name = turkish_upper(name)
-    re_space = re.compile(r'\s+')
-    return re_space.sub(' ', name).strip()
+    return re.sub(r"\s+", " ", name).strip()
 
 
 target_mappings = {
@@ -63,26 +50,18 @@ target_mappings = {
     "İHSAN DOĞRAMACI BİLKENT ÜNİVERSİTESİ (ANKARA) (Vakıf Üniversitesi)": "İhsan Doğramacı Bilkent Üniversitesi",
     "SABANCI ÜNİVERSİTESİ (İSTANBUL) (Vakıf Üniversitesi)": "Sabancı Üniversitesi",
     "KOCAELİ ÜNİVERSİTESİ (Devlet Üniversitesi)": "Kocaeli Üniversitesi",
-    "SİVAS CUMHURİYET ÜNİVERSİTESİ (Devlet Üniversitesi)": "Sivas Cumhuriyet Üniversitesi"
+    "SİVAS CUMHURİYET ÜNİVERSİTESİ (Devlet Üniversitesi)": "Sivas Cumhuriyet Üniversitesi",
 }
 
 
 def extract_to_csv(file_path: str, csv_output: str, excel_output: str) -> bool:
-    """
-    XLS dosyasından veriyi okur, CSV ve Excel dosyalarına yazar.
-    Başarılıysa True, değilse False döner.
-    """
     if not os.path.exists(file_path):
         print(f"[HATA] Dosya bulunamadı: {file_path}")
         return False
 
-    print("Veri yükleniyor...")
     df = pd.read_excel(file_path)
-
-    extracted_data = []
-    current_uni_full = None
-    current_uni_clean = None
-    current_faculty = None
+    extracted = []
+    current_uni_full = current_uni_clean = current_faculty = None
 
     for idx in range(2, len(df)):
         row = df.iloc[idx]
@@ -104,16 +83,14 @@ def extract_to_csv(file_path: str, csv_output: str, excel_output: str) -> bool:
                             matched = True
                             break
                     if not matched:
-                        current_uni_full = None
-                        current_uni_clean = None
-                        current_faculty = None
+                        current_uni_full = current_uni_clean = current_faculty = None
                 else:
                     if current_uni_clean is not None:
                         current_faculty = name.strip()
         else:
             if current_uni_clean is not None:
                 prog_code = str(code).strip()
-                if prog_code.endswith('.0'):
+                if prog_code.endswith(".0"):
                     prog_code = prog_code[:-2]
 
                 prog_name = str(name).strip() if not pd.isna(name) else ""
@@ -124,10 +101,10 @@ def extract_to_csv(file_path: str, csv_output: str, excel_output: str) -> bool:
                 rank = row.iloc[11]
                 min_score = row.iloc[12]
 
-                extracted_data.append({
+                extracted.append({
                     "Üniversite (Spreadsheet)": current_uni_full,
                     "Üniversite Adı": current_uni_clean,
-                    "Fakülte/Yüksekokul": current_faculty if current_faculty else "Genel",
+                    "Fakülte/Yüksekokul": current_faculty or "Genel",
                     "Program Kodu": prog_code,
                     "Program Adı": prog_name,
                     "Süre (Yıl)": duration,
@@ -138,26 +115,26 @@ def extract_to_csv(file_path: str, csv_output: str, excel_output: str) -> bool:
                     "Taban Puan (En Küçük Puan)": min_score
                 })
 
-    out_df = pd.DataFrame(extracted_data)
-    if len(out_df) == 0:
+    out_df = pd.DataFrame(extracted)
+    if out_df.empty:
         print("[HATA] Eşleşen veri bulunamadı.")
         return False
 
-    print("Veri tipleri optimize ediliyor...")
-    out_df['Başarı Sırası'] = pd.to_numeric(out_df['Başarı Sırası'], errors='coerce').fillna(0).astype(int)
-    out_df['Taban Puan (En Küçük Puan)'] = pd.to_numeric(
-        out_df['Taban Puan (En Küçük Puan)'], errors='coerce').fillna(0.0)
-    out_df['Puan Türü'] = out_df['Puan Türü'].astype('category')
-    out_df['Süre (Yıl)'] = pd.to_numeric(out_df['Süre (Yıl)'], errors='coerce').fillna(0).astype(int)
-    out_df['Genel Kontenjan'] = pd.to_numeric(out_df['Genel Kontenjan'], errors='coerce').fillna(0).astype(int)
-    out_df['Okul Birincisi Kontenjanı'] = pd.to_numeric(
-        out_df['Okul Birincisi Kontenjanı'], errors='coerce').fillna(0).astype(int)
+    out_df["Başarı Sırası"] = pd.to_numeric(out_df["Başarı Sırası"], errors="coerce").fillna(0).astype(int)
+    out_df["Taban Puan (En Küçük Puan)"] = pd.to_numeric(
+        out_df["Taban Puan (En Küçük Puan)"], errors="coerce"
+    ).fillna(0.0)
+    out_df["Puan Türü"] = out_df["Puan Türü"].astype("category")
+    out_df["Süre (Yıl)"] = pd.to_numeric(out_df["Süre (Yıl)"], errors="coerce").fillna(0).astype(int)
+    out_df["Genel Kontenjan"] = pd.to_numeric(out_df["Genel Kontenjan"], errors="coerce").fillna(0).astype(int)
+    out_df["Okul Birincisi Kontenjanı"] = pd.to_numeric(
+        out_df["Okul Birincisi Kontenjanı"], errors="coerce"
+    ).fillna(0).astype(int)
 
     out_df.to_excel(excel_output, index=False)
     out_df.to_csv(csv_output, index=False, encoding="utf-8-sig")
-    print(f"[OK]  Çıktı dosyaları kaydedildi: {excel_output}, {csv_output}")
-    print(f"      Toplam satır: {len(out_df)} | "
-          f"Üniversite sayısı: {out_df['Üniversite Adı'].nunique()}")
+    print(f"[OK] Çıktılar kaydedildi: {excel_output}, {csv_output}")
+    print(f"      Satır: {len(out_df)} | Üniversite sayısı: {out_df['Üniversite Adı'].nunique()}")
     return True
 
 
@@ -166,16 +143,12 @@ def main():
     csv_output = os.path.join(_PROJECT_ROOT, "universite_bolum_puanlar.csv")
     excel_output = os.path.join(_PROJECT_ROOT, "universite_bolum_puanlar.xlsx")
 
-    # ── Adım 1: XLS → CSV / Excel ────────────────────────────────────────────
     ok = extract_to_csv(xls_file, csv_output, excel_output)
     if not ok:
         sys.exit(1)
 
-    # ── Adım 2: CSV → departments.db (SQLAlchemy ORM) ────────────────────────
-    # seed.py, CSV yolunu _CSV_PATH sabitiyle _PROJECT_ROOT'tan okur;
-    # yukarıda csv_output aynı yere yazıldığı için doğrudan çağrılabilir.
-    print("\nSQLAlchemy ORM seed başlatılıyor → backend/app/db/departments.db")
-    from backend.app.db.seed import seed  # noqa: E402  (geç import — sys.path hazır)
+    print("\nSQLAlchemy seed başlatılıyor → backend/app/db/departments.db")
+    from backend.app.db.seed import seed
     seed()
 
 
