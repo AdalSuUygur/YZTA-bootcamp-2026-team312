@@ -51,6 +51,21 @@ def test_missing_api_key() -> None:
             os.environ["GEMINI_API_KEY"] = original
 
 
+def test_atlas_enrichment() -> None:
+    print("=== 4) YÖK Atlas DB zenginleştirme (Task 2.1/2.2) ===")
+    from app.services.atlas_service import get_universities_by_code
+
+    universities = get_universities_by_code("bilgisayar_muh")
+    assert len(universities) > 0, "bilgisayar_muh için üniversite bulunamadı — 'python -m app.db.seed' çalıştırıldı mı?"
+    ranks = [u.last_min_rank for u in universities]
+    assert ranks == sorted(ranks), "Üniversiteler last_min_rank ASC sırayla gelmiyor"
+    print(f"OK: {len(universities)} üniversite, sıralı geldi. İlk sıradaki: {universities[0].university_name}")
+
+    empty = get_universities_by_code("olmayan_bir_kod")
+    assert empty == [], "Bilinmeyen kod için boş liste dönmesi bekleniyordu (graceful degradation)"
+    print("OK: bilinmeyen kod için boş liste döndü, uygulama çökmedi.\n")
+
+
 def test_llm_call(n_runs: int = 3) -> None:
     print(f"=== 3) Gemini çağrısı ({n_runs} tekrar, tutarlılık kontrolü) ===")
     if not os.getenv("GEMINI_API_KEY"):
@@ -66,8 +81,10 @@ def test_llm_call(n_runs: int = 3) -> None:
             continue
 
         bolumler = [b.bolum for b in result.onerilen_bolumler]
+        kodlar = [b.department_code.value for b in result.onerilen_bolumler]
         assert len(bolumler) == 5, f"Tam 5 bölüm bekleniyordu, {len(bolumler)} geldi"
         assert len(set(bolumler)) == 5, "Bölüm önerilerinde tekrar var"
+        assert len(set(kodlar)) == 5, "department_code önerilerinde tekrar var"
 
         print(f"\n-- Deneme {i + 1} --")
         print(f"Holland kodu: {result.holland_kodu}")
@@ -83,4 +100,5 @@ def test_llm_call(n_runs: int = 3) -> None:
 if __name__ == "__main__":
     test_scoring()
     test_missing_api_key()
+    test_atlas_enrichment()
     test_llm_call()

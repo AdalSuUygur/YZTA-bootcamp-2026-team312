@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GuideAI - Kendini Tanı</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px 0; box-sizing: border-box; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 700px; width: 100%; text-align: center; max-height: calc(100vh - 40px); overflow-y: auto; box-sizing: border-box; }
         .screen { display: none; }
         .screen.active { display: block; }
         h1 { color: #2c3e50; }
@@ -19,9 +19,33 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .result-list { text-align: left; margin-top: 20px; list-style-type: none; padding: 0; }
-        .result-item { background: #f8f9fa; margin-bottom: 15px; padding: 15px; border-left: 4px solid #3498db; border-radius: 4px; }
-        .result-title { font-weight: bold; font-size: 18px; color: #2c3e50; }
-        .result-desc { font-size: 14px; color: #555; margin-top: 5px; }
+
+        /* Task 2.4 — Akordeon kart yapısı */
+        .accordion-card { background: #f8f9fa; margin-bottom: 15px; border-radius: 6px; border-left: 4px solid #3498db; overflow: hidden; }
+        .accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; user-select: none; }
+        .accordion-header:hover { background: #eef1f2; }
+        .accordion-title { font-weight: bold; font-size: 18px; color: #2c3e50; }
+        .accordion-score { font-weight: bold; color: #27ae60; font-size: 16px; white-space: nowrap; margin-left: 10px; }
+        .accordion-chevron { transition: transform 0.3s ease; margin-left: 10px; color: #7f8c8d; }
+        .accordion-card.open .accordion-chevron { transform: rotate(180deg); }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .accordion-card.open .accordion-body { max-height: 600px; }
+        .accordion-body-inner { padding: 0 15px 15px 15px; }
+        .result-desc { font-size: 14px; color: #555; margin: 0 0 12px 0; text-align: left; }
+
+        /* Responsive tablo sarmalayıcı — mobilde taşma yerine yatay scroll */
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .uni-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
+        .uni-table th, .uni-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+        .uni-table th { color: #7f8c8d; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+        .uni-empty { font-size: 13px; color: #999; font-style: italic; padding: 8px 0; }
+        .compare-btn { background: #ecf6ff; color: #3498db; border: 1px solid #3498db; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .compare-btn.added { background: #3498db; color: white; }
+
+        @media (max-width: 480px) {
+            .container { padding: 20px; border-radius: 0; max-width: 100%; height: 100%; }
+            .accordion-title { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -53,7 +77,7 @@
 
     <div id="screen-results" class="screen">
         <h2>Sana En Uygun Bölümler</h2>
-        <ul id="results-list" class="result-list"></ul>
+        <div id="results-list"></div>
         <button class="btn" onclick="location.reload()">Testi Tekrar Çöz</button>
     </div>
 </div>
@@ -62,6 +86,53 @@
     let questions = [];
     let currentQuestionIndex = 0;
     let userAnswers = {}; // {soru_no: deger} formatında tutulacak
+
+    // Katman 3 (Üniversite Karşılaştır) ön hazırlığı: seçilen üniversiteler burada tutulur.
+    // Şimdilik sadece frontend state'i; bir sonraki sprintte Context/localStorage'a taşınabilir.
+    let compareList = [];
+
+    // Backend/DB henüz hazır olmadığında UI'ı test etmek için: index.html?mock=true
+    const MOCK_MODE = new URLSearchParams(window.location.search).get('mock') === 'true';
+
+    const MOCK_RESULT = {
+        onerilen_bolumler: [
+            {
+                department_code: "bilgisayar_muh", department_name: "Bilgisayar Mühendisliği", uyum_skoru: 95,
+                gerekce: "Analitik düşünce yapın ve problem çözme becerin çok güçlü.",
+                universities: [
+                    { university_name: "İstanbul Teknik Üniversitesi (İTÜ)", quota: 120, last_min_score: 542.31, last_min_rank: 3200 },
+                    { university_name: "Orta Doğu Teknik Üniversitesi (ODTÜ)", quota: 150, last_min_score: 538.77, last_min_rank: 4100 },
+                    { university_name: "Boğaziçi Üniversitesi", quota: 100, last_min_score: 545.10, last_min_rank: 2100 }
+                ]
+            },
+            {
+                department_code: "endustri_muh", department_name: "Endüstri Mühendisliği", uyum_skoru: 88,
+                gerekce: "Sistem analizi ve optimizasyon yeteneğin öne çıkıyor.",
+                universities: [
+                    { university_name: "Boğaziçi Üniversitesi", quota: 90, last_min_score: 520.44, last_min_rank: 5600 }
+                ]
+            },
+            {
+                department_code: "psikoloji", department_name: "Psikoloji", uyum_skoru: 81,
+                gerekce: "İnsan davranışlarını anlamaya ve sosyal etkileşime yatkınsın.",
+                universities: [] // DB'de bu bölüm için veri yok senaryosu — boş liste render'ının test edilmesi için
+            },
+            {
+                department_code: "mimarlik", department_name: "Mimarlık", uyum_skoru: 76,
+                gerekce: "Yaratıcı ve mekansal düşünme becerin dikkat çekiyor.",
+                universities: [
+                    { university_name: "Yıldız Teknik Üniversitesi", quota: 110, last_min_score: 425.60, last_min_rank: 27500 }
+                ]
+            },
+            {
+                department_code: "istatistik", department_name: "İstatistik", uyum_skoru: 70,
+                gerekce: "Sayısal verilerle çalışmaktan ve modelleme yapmaktan keyif alırsın.",
+                universities: [
+                    { university_name: "Hacettepe Üniversitesi", quota: 80, last_min_score: 420.35, last_min_rank: 29500 }
+                ]
+            }
+        ]
+    };
 
     // JSON dosyasını çekme işlemi
     async function startTest() {
@@ -111,18 +182,27 @@
         }));
 
         try {
-            const response = await fetch('http://localhost:8000/api/v1/test/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ answers: answersList })
-            });
+            let resultData;
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.detail || `Sunucu hatası: ${response.status}`);
+            if (MOCK_MODE) {
+                // ?mock=true ile backend/DB olmadan accordion UI'ını test etmek için
+                await new Promise(r => setTimeout(r, 600));
+                resultData = MOCK_RESULT;
+            } else {
+                const response = await fetch('http://localhost:8000/api/v1/test/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answers: answersList })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.detail || `Sunucu hatası: ${response.status}`);
+                }
+
+                resultData = await response.json();
             }
 
-            const resultData = await response.json();
             renderResults(resultData.onerilen_bolumler);
 
         } catch (error) {
@@ -137,14 +217,97 @@
         const listContainer = document.getElementById('results-list');
         listContainer.innerHTML = '';
 
-        results.forEach(item => {
+        results.forEach((item, index) => {
+            const cardId = `acc-card-${index}`;
+            const universities = item.universities || [];
+
+            const tableRows = universities.map((u, uIdx) => {
+                const rowKey = `${item.department_code}__${u.university_name}__${uIdx}`;
+                const isAdded = compareList.some(c => c.key === rowKey);
+                return `
+                    <tr>
+                        <td>${escapeHtml(u.university_name || '-')}</td>
+                        <td>${u.quota ?? '-'}</td>
+                        <td>${u.last_min_score ?? '-'}</td>
+                        <td>${u.last_min_rank ?? '-'}</td>
+                        <td>
+                            <button class="compare-btn ${isAdded ? 'added' : ''}"
+                                    onclick="toggleCompare(event, '${escapeJs(rowKey)}', '${escapeJs(item.department_name)}', '${escapeJs(u.university_name || '')}')">
+                                ${isAdded ? '✓ Eklendi' : '+ Ekle'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const tableHtml = universities.length > 0 ? `
+                <div class="table-wrapper">
+                    <table class="uni-table">
+                        <thead>
+                            <tr>
+                                <th>Üniversite Adı</th>
+                                <th>Kontenjan</th>
+                                <th>Taban Puan</th>
+                                <th>Başarı Sıralaması</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            ` : `<p class="uni-empty">Bu bölüm için üniversite verisi henüz bulunmuyor.</p>`;
+
             listContainer.innerHTML += `
-                <li class="result-item">
-                    <div class="result-title">${item.bolum} - %${item.uyum_skoru} Uyum</div>
-                    <div class="result-desc">${item.gerekce}</div>
-                </li>
+                <div class="accordion-card" id="${cardId}">
+                    <div class="accordion-header" onclick="toggleAccordion('${cardId}')">
+                        <span class="accordion-title">${escapeHtml(item.department_name)}</span>
+                        <span style="display:flex; align-items:center;">
+                            <span class="accordion-score">%${item.uyum_skoru} Uyum</span>
+                            <span class="accordion-chevron">▼</span>
+                        </span>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <p class="result-desc">${escapeHtml(item.gerekce)}</p>
+                            ${tableHtml}
+                        </div>
+                    </div>
+                </div>
             `;
         });
+    }
+
+    function toggleAccordion(cardId) {
+        document.getElementById(cardId).classList.toggle('open');
+    }
+
+    function toggleCompare(event, rowKey, bolum, universiteAdi) {
+        event.stopPropagation(); // accordion'un kapanmasını engelle
+        const existingIndex = compareList.findIndex(c => c.key === rowKey);
+
+        if (existingIndex >= 0) {
+            compareList.splice(existingIndex, 1);
+        } else {
+            compareList.push({ key: rowKey, bolum, universite: universiteAdi });
+        }
+
+        // Katman 3'te bu state karşılaştırma ekranına taşınacak
+        console.log('Karşılaştırma listesi:', compareList);
+
+        const btn = event.currentTarget;
+        const nowAdded = compareList.some(c => c.key === rowKey);
+        btn.classList.toggle('added', nowAdded);
+        btn.innerText = nowAdded ? '✓ Eklendi' : '+ Ekle';
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.innerText = str ?? '';
+        return div.innerHTML;
+    }
+
+    function escapeJs(str) {
+        return String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     }
 
     function showScreen(screenId) {
