@@ -111,3 +111,42 @@ Kullanıcının hangi alanlara ve mesleklere yatkın olduğunu anlamasını sağ
 <img width="1467" height="930" alt="image" src="https://github.com/user-attachments/assets/79763e73-3146-4ed9-b139-fbb1619a7e28" />
 
 ---
+
+### 🎯 Sprint 2 Hedefi (Sprint Goal)
+Katman 1'de ("Kendini Tanı") üretilen bölüm önerilerini, YÖK Atlas'ın resmi üniversite verileriyle (taban puan, başarı sıralaması, kontenjan) ilişkisel bir veri tabanı üzerinden zenginleştirmek; bu zenginleştirilmiş veriyi tek bir API çağrısıyla frontend'e ulaştırmak ve kullanıcıya akordeon tabanlı, üniversite kıyaslamasına hazır bir sonuç ekranında sunmak.
+
+### 🛠️ Sprint İçerisinde Tamamlanan Görevler (Done)
+ * **Task 2.1:** MVP kapsamında belirlenen 20-30 üniversitenin resmi YÖK Atlas taban puan, başarı sıralaması ve kontenjan verilerinin ilişkisel bir SQLite veri tabanına (backend/app/db/departments.db) taşınması ve ORM modellerinin oluşturulması.
+ * **Task 2.2: AI Çıktısı ile YÖK Atlas Verilerini Eşleştiren SQL Servisinin Yazılması:** Katman 1'deki Gemini/OpenAI API'sinden dönen 5 adet department_code bilgisini girdi olarak alan ve bu bölümlerin veri tabanındaki (Task 2.1) karşılıklarını bularak resmi üniversite taban puan, başarı sıralaması ve kontenjan detaylarıyla zenginleştiren backend algoritmasının kodlanması.
+ * **Task 2.3: POST /api/v1/test/submit Endpoint Çıktısının Zenginleştirilmesi:** Mevcut test gönderme endpoint'inin, sadece yapay zekadan gelen ham önerileri değil; Task 2.2'de yazılan SQL servisini de tetikleyerek YÖK Atlas verileriyle birleştirilmiş zengin nesneyi frontend'e tek seferde dönmesini sağlamak.
+ * **Task 2.4: Önerilen Bölümlerin ve Üniversite Tablolarının (Frontend) Listelenmesi:** Backend'den dönen zenginleştirilmiş yeni veri yapısını (DetailedDepartmentMatch) ön yüzde kullanıcı dostu, akordeon (dropdown) mimarisiyle listelemek ve verileri düzenli tablolara dönüştürmek.
+
+#### **Kanban Board Durumu:** Katman 2'ye ait olan Task 2.1, Task 2.2, Task 2.3 ve Task 2.4 görevleri başarıyla **DONE** sütununa taşınmıştır.
+
+<img width="1464" height="842" alt="image" src="https://github.com/user-attachments/assets/86eb3a36-5db7-4727-a756-36a05f1f55f1" />
+
+---
+
+#### **Slack / Daily Scrum Notları:** 
+
+<img width="1465" height="812" alt="image" src="https://github.com/user-attachments/assets/80d29d73-d599-4edf-ac74-5fe775a73cd4" />
+
+---
+
+#### **Sprint 2 - Review**
+
+* Üniversite verisi için ilişkisel bir SQLite veri tabanı katmanı (SQLAlchemy ORM) projeye entegre edildi.
+* LLM çıktısı ile veri tabanı arasındaki eşleştirme, serbest metin yerine kapalı bir kod sözlüğü (enum) ile güvenilir hale getirildi.
+* `POST /api/v1/test/submit` endpoint'i artık tek çağrıda hem AI önerisini hem resmi üniversite verisini dönen uçtan uca çalışan bir akış sundu.
+* Frontend'de akordeon ve tablo yapısı ile Katman 3'e (Üniversite Karşılaştır) geçiş için state altyapısı hazırlandı.
+
+---
+
+#### **Sprint Retrospective:** Takımın önceki sprintteki eksiklikleri giderildiğine dair birbirimizden haberdar olmamız takdir edildi.
+
+* MVP veri seti şu an ham YÖK Atlas kaynağından değil, gerçekçi aralıklarda hazırlanmış örnek (seed) verilerden oluşuyor; ham kaynak dosya ekipte paylaşıldığında `extract_data.py` pipeline'ı üzerinden gerçek verilerle değiştirilmesi gerekiyor — bu, gelecek sprint için not edildi.
+* Görev tanımları ile kod tabanı arasında (ör. şema alan adları, dosya konumları) küçük tutarsızlıklar fark edildi; sprint başında görev metinlerinin ilgili kod dosyalarıyla birlikte hızlıca gözden geçirilmesinin ileride zaman kazandıracağı değerlendirildi.
+
+<img width="1431" height="508" alt="image" src="https://github.com/user-attachments/assets/96821245-86f3-4d6e-b2c9-9e05dda6e7bd" />
+
+---
